@@ -1,3 +1,4 @@
+#include <avr/pgmspace.h>
 #include <MatrixDisplay.h>
 #include <DisplayToolbox.h>
 #include <font.h>
@@ -5,7 +6,7 @@
 #include <EtherCard.h>
 // configure buffer size to 700 octets
 uint8_t Ethernet::buffer[700];
-static long timer;
+static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
 
 // Easy to use function
 #define setMaster(dispNum, CSPin) initDisplay(dispNum,CSPin,true)
@@ -23,7 +24,9 @@ MatrixDisplay disp(SIGN_NUM_DISPLAYS,
                    SIGN_SHADOW_BUF);
 // Pass a copy of the display into the toolbox
 DisplayToolbox toolbox(&disp);
-const String charLookup PROGMEM  = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),-.?></\\|[]_=+:'\"{}";
+static const String charLookup PROGMEM  = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),-.?></\\|[]_=+:'\"{}";
+static const char httpResponse[] PROGMEM = "HTTP/1.1 204 No Content\n"; 
+
 
 // Prepare boundaries
 uint8_t X_MAX = 0;
@@ -58,32 +61,47 @@ void setup() {
 //
 void loop()
 {
-  snprintf_P(message, sizeof(message) - 1, PSTR("Free Memory: %d"), get_free_memory());
-  scrollText(message, false);
+  unsigned long pos, cur;
+  pos = ether.packetLoop(ether.packetReceive());// check if valid tcp data is received
+  if (pos) {
+    char* data = (char *) Ethernet::buffer + pos;
+    cur=0;
+    if (strncmp("POST /message", data, 13) == 0) {// nothing specified
+      ether.httpServerReplyAck();
+      memcpy_P(ether.tcpOffset(), httpResponse, sizeof httpResponse);
+      ether.httpServerReply_with_flags(sizeof(httpResponse)-1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
+      snprintf_P(message, sizeof(message)-1, PSTR("Received POST to /message"));
+  fixedText(message);
   delay(2000);
+    }
+  } else {
+    snprintf_P(message, sizeof(message)-1, PSTR("Free Memory: %d"), get_free_memory());
+  }
+
+  fixedText(message);
+  //delay(2000);
 }
 
 // Initialize network card
 void initNetwork() {
   // define (unique on LAN) hardware (MAC) address
-  static uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
 
   uint8_t nFirmwareVersion = ether.begin(sizeof Ethernet::buffer, mymac);
   if (0 == nFirmwareVersion) {
-    snprintf_P(message, sizeof(message)-1, PSTR("Error initializing ethernet card!"));
-    scrollText(message, true);
-    flash(2000);
+    //snprintf_P(message, sizeof(message)-1, PSTR("Error initializing ethernet card!"));
+    //scrollText(message, true);
+    //flash(2000);
     return;
   }
 
   if (!ether.dhcpSetup()) {
-    snprintf_P(message, sizeof(message)-1, PSTR("DHCP Failed!"));
-    scrollText(message, true);
+    //snprintf_P(message, sizeof(message)-1, PSTR("DHCP Failed!"));
+    //scrollText(message, true);
     return;
   }
   
-  snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
-  scrollText(message, true);
+  //snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
+  //scrollText(message, true);
 } 
 
 void scrollText(char* text, int pastEnd) {
