@@ -71,8 +71,8 @@ void loop()
       memcpy_P(ether.tcpOffset(), httpResponse, sizeof httpResponse);
       ether.httpServerReply_with_flags(sizeof(httpResponse)-1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
       snprintf_P(message, sizeof(message)-1, PSTR("Received POST to /message"));
-  fixedText(message);
-  delay(2000);
+      fixedText(message);
+      delay(2000);
     }
   } else {
     snprintf_P(message, sizeof(message)-1, PSTR("Free Memory: %d"), get_free_memory());
