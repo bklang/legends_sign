@@ -1,9 +1,9 @@
 #include <avr/pgmspace.h>
-#include <MatrixDisplay.h>
-#include <DisplayToolbox.h>
-#include <font.h>
+#include "libraries/MatrixDisplay/MatrixDisplay.h"
+#include "libraries/MatrixDisplay/DisplayToolbox.h"
+#include "libraries/MatrixDisplay/font.h"
 
-#include <EtherCard.h>
+#include "libraries/ethercard/EtherCard.h"
 // configure buffer size to 700 octets
 uint8_t Ethernet::buffer[700];
 static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
