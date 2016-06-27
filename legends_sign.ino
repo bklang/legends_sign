@@ -95,13 +95,13 @@ void initNetwork() {
   }
 
   if (!ether.dhcpSetup()) {
-    //snprintf_P(message, sizeof(message)-1, PSTR("DHCP Failed!"));
-    //scrollText(message, true);
+    snprintf_P(message, sizeof(message)-1, PSTR("DHCP Failed!"));
+    scrollText(message, true);
     return;
   }
   
-  //snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
-  //scrollText(message, true);
+  snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
+  scrollText(message, true);
 } 
 
 void scrollText(char* text, int pastEnd) {
