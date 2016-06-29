@@ -24,8 +24,8 @@ MatrixDisplay disp(SIGN_NUM_DISPLAYS,
                    SIGN_SHADOW_BUF);
 // Pass a copy of the display into the toolbox
 DisplayToolbox toolbox(&disp);
-static const String charLookup PROGMEM  = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),-.?></\\|[]_=+:'\"{}";
-static const char httpResponse[] PROGMEM = "HTTP/1.1 204 No Content\n";
+static const char PROGMEM charLookup[]  = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),-.?></\\|[]_=+:'\"{}";
+static const char PROGMEM httpResponse[] = "HTTP/1.1 204 No Content\r\n";
 
 
 // Prepare boundaries
@@ -167,11 +167,12 @@ void flash(int duration) {
 void drawChar(int x, int y, char c){
   int dots;
 
-  c = charLookup.indexOf(c);
+  const char *offset = strchr_P(charLookup, c);
+  int idx = offset - charLookup;
 
   for (char col=0; col< 5; col++) {
     if((x+col+1)>0 && x < X_MAX){ // dont write to the display buffer if the location is out of range
-      dots = pgm_read_byte_near(&myfont[c][col]);
+      dots = pgm_read_byte_near(&myfont[idx][col]);
       for (char row=0; row < 7; row++) {
         if (dots & (64>>row))   	     // only 7 rows.
           toolbox.setPixel(x+col, y+row, 1);
