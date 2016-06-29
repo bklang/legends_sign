@@ -14,7 +14,7 @@ static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
 
 #define SIGN_NUM_DISPLAYS 4
 #define SIGN_WR_PIN 10
-#define SIGN_DATA_PIN 9 
+#define SIGN_DATA_PIN 9
 #define SIGN_SHADOW_BUF true
 
 // Init Matrix
@@ -25,7 +25,7 @@ MatrixDisplay disp(SIGN_NUM_DISPLAYS,
 // Pass a copy of the display into the toolbox
 DisplayToolbox toolbox(&disp);
 static const String charLookup PROGMEM  = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),-.?></\\|[]_=+:'\"{}";
-static const char httpResponse[] PROGMEM = "HTTP/1.1 204 No Content\n"; 
+static const char httpResponse[] PROGMEM = "HTTP/1.1 204 No Content\n";
 
 
 // Prepare boundaries
@@ -43,11 +43,11 @@ void setup() {
   // Fetch bounds
   X_MAX = disp.getDisplayCount() * disp.getDisplayWidth();
   Y_MAX = disp.getDisplayHeight();
-  
+
   // Prepare displays
   // The first number represents how the buffer/display is stored in memory. Could be useful for reorganising the displays or matching the physical layout
   // The number is a array index and is sequential from 0. You can't use 4-8. You must use the numbers 0-4
-  // The second number represents the "CS" pin (ie: CS1, CS2, CS3, CS4) this controls which panel is enabled at any one time. 
+  // The second number represents the "CS" pin (ie: CS1, CS2, CS3, CS4) this controls which panel is enabled at any one time.
   disp.setMaster(0,4);
   disp.setSlave(1,5);
   disp.setSlave(2,6);
@@ -99,10 +99,10 @@ void initNetwork() {
     scrollText(message, true);
     return;
   }
-  
   snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
+
   scrollText(message, true);
-} 
+}
 
 void scrollText(char* text, int pastEnd) {
   int y=1;
@@ -112,11 +112,11 @@ void scrollText(char* text, int pastEnd) {
 
   for(int Xpos = X_MAX; Xpos > endPos; Xpos--){
     disp.clear();
-    drawString(Xpos,y,text); 
+    drawString(Xpos,y,text);
     disp.syncDisplays();
     delay(1);
   }
-  
+
 //  EXPERIMENTAL IMPLEMENTATION! NOT WORKING!
 //  disp.clear();
 //  drawString(X_MAX-100,y,text);
@@ -137,7 +137,7 @@ void fixedText(char* text){
   int x = 0;
   disp.clear();
   drawString(x,y,text);
-  disp.syncDisplays(); 
+  disp.syncDisplays();
 }
 
 
@@ -163,16 +163,16 @@ void flash(int duration) {
 // Output a single character to the display
 void drawChar(int x, int y, char c){
   int dots;
-  
+
   c = charLookup.indexOf(c);
-  
+
   for (char col=0; col< 5; col++) {
     if((x+col+1)>0 && x < X_MAX){ // dont write to the display buffer if the location is out of range
       dots = pgm_read_byte_near(&myfont[c][col]);
       for (char row=0; row < 7; row++) {
         if (dots & (64>>row))   	     // only 7 rows.
           toolbox.setPixel(x+col, y+row, 1);
-        else 
+        else
           toolbox.setPixel(x+col, y+row, 0);
       }
     }
