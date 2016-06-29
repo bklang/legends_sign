@@ -65,20 +65,24 @@ void loop()
   pos = ether.packetLoop(ether.packetReceive());// check if valid tcp data is received
   if (pos) {
     char* data = (char *) Ethernet::buffer + pos;
-    if (strncmp("POST /message", data, 13) == 0) {// nothing specified
+    if (strncmp("POST /message", data, 13) == 0) {
+      char *param = strstr(data, "msg=");
+      if (param != 0) {
+        param += 4;
+        snprintf(message, sizeof message - 1, "%s", param);
+      } else {
+        snprintf_P(message, sizeof message - 1, PSTR("Received POST with no data!"));
+      }
+
       ether.httpServerReplyAck();
       memcpy_P(ether.tcpOffset(), httpResponse, sizeof httpResponse);
-      ether.httpServerReply_with_flags(sizeof(httpResponse)-1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
-      snprintf_P(message, sizeof(message)-1, PSTR("Received POST to /message"));
-      fixedText(message);
-      delay(2000);
+      ether.httpServerReply_with_flags(sizeof httpResponse - 1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
+      scrollText(message, true);
     }
   } else {
-    snprintf_P(message, sizeof(message)-1, PSTR("Free Memory: %d"), get_free_memory());
+    snprintf_P(message, sizeof message - 1, PSTR("Free Memory: %d"), get_free_memory());
+    fixedText(message);
   }
-
-  fixedText(message);
-  //delay(2000);
 }
 
 // Initialize network card
