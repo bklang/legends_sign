@@ -61,11 +61,10 @@ void setup() {
 //
 void loop()
 {
-  unsigned long pos, cur;
+  unsigned long pos;
   pos = ether.packetLoop(ether.packetReceive());// check if valid tcp data is received
   if (pos) {
     char* data = (char *) Ethernet::buffer + pos;
-    cur=0;
     if (strncmp("POST /message", data, 13) == 0) {// nothing specified
       ether.httpServerReplyAck();
       memcpy_P(ether.tcpOffset(), httpResponse, sizeof httpResponse);
