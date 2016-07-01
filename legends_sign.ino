@@ -170,7 +170,7 @@ void drawString(int x, uint8_t y, char* c){
 void flash(int duration) {
   for(int y=0; y < Y_MAX; ++y)	{
     for(int x = 0; x< X_MAX; ++x) {
-      toolbox.setPixel(x, y, 1, true); // Lets write straight to the display.
+      toolbox.setPixel(x, y, 1);
     }
   }
   disp.syncDisplays();
