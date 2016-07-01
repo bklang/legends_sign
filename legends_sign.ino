@@ -5,7 +5,7 @@
 
 #include "libraries/ethercard/EtherCard.h"
 // configure buffer size to 700 octets
-uint8_t Ethernet::buffer[700];
+uint8_t Ethernet::buffer[500];
 static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
 
 // Easy to use function
