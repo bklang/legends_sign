@@ -17,6 +17,8 @@ static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
 #define SIGN_DATA_PIN 9
 #define SIGN_SHADOW_BUF true
 
+#define NOTICE_FLASH_DURATION 400
+
 // Init Matrix
 MatrixDisplay disp(SIGN_NUM_DISPLAYS,
                    SIGN_WR_PIN,
@@ -77,7 +79,7 @@ void loop()
       ether.httpServerReplyAck();
       memcpy_P(ether.tcpOffset(), httpResponse, sizeof httpResponse);
       ether.httpServerReply_with_flags(sizeof httpResponse - 1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
-      scrollText(message, true);
+      notice(message);
     }
   } else {
     snprintf_P(message, sizeof message - 1, PSTR("Free Memory: %d"), get_free_memory());
@@ -105,6 +107,19 @@ void initNetwork() {
   snprintf_P(message, sizeof(message)-1, PSTR("Net v%d OK. IP: %d.%d.%d.%d"), nFirmwareVersion, ether.myip[0], ether.myip[1], ether.myip[2], ether.myip[3]);
 
   scrollText(message, true);
+}
+
+void notice(char *text) {
+  flash(NOTICE_FLASH_DURATION);
+  delay(NOTICE_FLASH_DURATION/2);
+
+  flash(NOTICE_FLASH_DURATION);
+  delay(NOTICE_FLASH_DURATION/2);
+
+  flash(NOTICE_FLASH_DURATION);
+  delay(NOTICE_FLASH_DURATION/2);
+
+  scrollText(text, true);
 }
 
 void scrollText(char* text, int pastEnd) {
@@ -158,8 +173,10 @@ void flash(int duration) {
       toolbox.setPixel(x, y, 1, true); // Lets write straight to the display.
     }
   }
+  disp.syncDisplays();
   delay(duration);
   disp.clear();
+  disp.syncDisplays();
 }
 
 
