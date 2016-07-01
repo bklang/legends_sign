@@ -91,9 +91,9 @@ void initNetwork() {
 
   uint8_t nFirmwareVersion = ether.begin(sizeof Ethernet::buffer, mymac);
   if (0 == nFirmwareVersion) {
-    //snprintf_P(message, sizeof(message)-1, PSTR("Error initializing ethernet card!"));
-    //scrollText(message, true);
-    //flash(2000);
+    snprintf_P(message, sizeof(message)-1, PSTR("Error initializing ethernet card!"));
+    scrollText(message, true);
+    flash(2000);
     return;
   }
 
