@@ -1,9 +1,9 @@
-#include <avr/pgmspace.h>
-#include "libraries/MatrixDisplay/MatrixDisplay.h"
-#include "libraries/MatrixDisplay/DisplayToolbox.h"
-#include "libraries/MatrixDisplay/font.h"
+//include <avr/pgmspace.h>
+#include <MatrixDisplay.h>
+#include <DisplayToolbox.h>
+#include <font.h>
 
-#include "libraries/ethercard/EtherCard.h"
+#include <EtherCard.h>
 // configure buffer size to 700 octets
 uint8_t Ethernet::buffer[500];
 static const uint8_t mymac[] = { 0x36, 0xA9, 0x34, 0x4A, 0x61, 0xF4 };
@@ -40,6 +40,8 @@ extern int *__brkval;
 
 // Message holder
 char message[256];
+unsigned long last_timestamp;
+bool show_message = false;
 
 void setup() {
   // Fetch bounds
@@ -54,6 +56,8 @@ void setup() {
   disp.setSlave(1,5);
   disp.setSlave(2,6);
   disp.setSlave(3,7);
+
+  last_timestamp = millis();
 
   // Briefly light the entire panel to show any non-working LEDs
   flash(2000);
@@ -81,8 +85,16 @@ void loop()
       ether.httpServerReply_with_flags(sizeof httpResponse - 1, TCP_FLAGS_ACK_V|TCP_FLAGS_FIN_V);
       notice(message);
     }
-  } else {
-    snprintf_P(message, sizeof message - 1, PSTR("Free Memory: %d"), get_free_memory());
+  } else { 
+//    if (millis() - last_timestamp > 2000) { 
+//      show_message = !show_message; 
+//      last_timestamp = millis();
+//    }
+//    if ( show_message ) {
+      snprintf_P(message, sizeof message - 1, PSTR("I fixed it"), get_free_memory());
+//    } else {
+//      snprintf_P(message, sizeof message - 1, PSTR(""), get_free_memory());
+//    }
     fixedText(message);
   }
 }
